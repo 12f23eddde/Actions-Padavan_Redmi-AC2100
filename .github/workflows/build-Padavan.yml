@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Checkout
@@ -38,7 +38,7 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        mv -f $CONFIG_FILE /opt/rt-n56u/trunk/configs/templates/$TNAME.config
+        cp -n $CONFIG_FILE .config
         chmod +x $DIY_SH
         cd /opt/rt-n56u
         $GITHUB_WORKSPACE/$DIY_SH
@@ -54,7 +54,7 @@ jobs:
       id: compile
       run: |
         cd /opt/rt-n56u/trunk
-        cp -f configs/templates/$TNAME.config .config
+        cp -n configs/templates/$TNAME.config .config
         sudo ./build_firmware_modify $TNAME 0 
         echo "::set-output name=status::success"
         echo "FILE_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
@@ -105,7 +105,7 @@ jobs:
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
       with:
-       token: ${{ secrets.ACTIONS_REPO_PAT }}
+       token: ${{ github.token }}
        repository: ${{ github.repository }}
        retain_days: 1
        keep_minimum_runs: 3
@@ -117,4 +117,4 @@ jobs:
        keep_latest: 3
        delete_tags: true
       env:
-       GITHUB_TOKEN: ${{ secrets.ACTIONS_REPO_PAT }}
+       GITHUB_TOKEN: ${{ github.token }}
